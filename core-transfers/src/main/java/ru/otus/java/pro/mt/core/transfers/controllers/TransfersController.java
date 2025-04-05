@@ -7,6 +7,9 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 import ru.otus.java.pro.mt.core.transfers.dtos.ExecuteTransferDtoRq;
 import ru.otus.java.pro.mt.core.transfers.dtos.TransferDto;
@@ -40,13 +43,15 @@ public class TransfersController {
     )
     public TransfersPageDto getAllTransfers(
             @Parameter(description = "Идентификатор клиента", required = true, schema = @Schema(type = "string", maxLength = 10, example = "1234567890"))
-            @RequestHeader(name = "client-id") String clientId
+            @RequestHeader(name = "client-id") String clientId,
+
+            @Parameter(description = "Параметры пагинации (page, size)")
+            @PageableDefault(size = 20) Pageable pageable
     ) {
+        Page<Transfer> page = transfersService.getAllTransfers(clientId, pageable);
         return new TransfersPageDto(
-                transfersService
-                        .getAllTransfers(clientId)
-                        .stream()
-                        .map(ENTITY_TO_DTO).collect(Collectors.toList())
+                page.getContent().stream().map(ENTITY_TO_DTO).collect(Collectors.toList()),
+                page.getTotalElements()
         );
     }
 
