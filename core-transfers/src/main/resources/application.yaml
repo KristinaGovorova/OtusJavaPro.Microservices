@@ -39,3 +39,12 @@ integration:
     url: http://localhost:8081/api
     read-timeout: 5s
     write-timeout: 5s
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+  prometheus:
+    metrics:
+      export:
+        enabled: true
